@@ -14,7 +14,6 @@ function KeyPressCb(~,evnt)
 global g
     %fprintf('key pressed: %s\n',evnt.Key);
     if strcmpi(evnt.Key,'leftarrow')
-        disp('leftarrow')
         n=g.updateBoard(2);
         g.plotBoard();
         if (n > 0)

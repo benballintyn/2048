@@ -47,7 +47,6 @@ classdef gameBoard < handle
                             if (j==1 || obj.board(j,i)==0)
                                 continue;
                             else
-                                disp([num2str(j) ',' num2str(i)])
                                 if (obj.board(j-1,i) == 0)
                                     aboveSquare = j-1;
                                     curSquare = j;
