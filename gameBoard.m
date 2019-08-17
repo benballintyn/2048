@@ -9,6 +9,7 @@ classdef gameBoard < handle
         boardWidth
         fourProb
         cmap
+        score
     end
     
     methods
@@ -24,30 +25,34 @@ classdef gameBoard < handle
             colPerm = randperm(4);
             obj.board(rowPerm(1),colPerm(1)) = 2;
             obj.board(rowPerm(2),colPerm(2)) = 2;
-            obj.cmap = jet;
+            obj.cmap = prism;
             obj.cmap(1,:) = ones(1,3);
-            figure;
-            plotBoard(obj)
+            if (strcmp(options.playMode,'human'))
+                disp('Manual play')
+            else
+                figure;
+                plotBoard(obj)
+            end
         end
         
-        function updateBoard(obj,move)
+        function nMoved=updateBoard(obj,move)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             obj.noCombine = zeros(obj.boardHeight,obj.boardWidth);
+            nMoved = 0;
             switch move
                 case 1 % up
                     for i=1:size(obj.board,2) % across columns (horizontal)
                         for j=1:size(obj.board,1) % down rows (vertical)
-                            if (j==1 || obj.board(i,j)==0)
-                                disp(['(' num2str(i) ',' num2str(j) ')'])
+                            if (j==1 || obj.board(j,i)==0)
                                 continue;
                             else
-                                disp([num2str(i) ',' num2str(j)])
+                                disp([num2str(j) ',' num2str(i)])
                                 if (obj.board(j-1,i) == 0)
                                     aboveSquare = j-1;
                                     curSquare = j;
-                                    while(aboveSquare > 0 && obj.board(aboveSquare,i) == 0)
-                                        disp('moving up...')
+                                    nMoved = nMoved+1;
+                                    while (aboveSquare > 0 && obj.board(aboveSquare,i) == 0)
                                         obj.board(aboveSquare,i) = obj.board(curSquare,i);
                                         obj.board(curSquare,i) = 0;
                                         aboveSquare = aboveSquare-1;
@@ -64,6 +69,7 @@ classdef gameBoard < handle
                                     obj.board(j-1,i) = obj.board(j-1,i)*2;
                                     obj.board(j,i) = 0;
                                     obj.noCombine(j-1,i) = 1;
+                                    nMoved=nMoved+1;
                                 end
                             end
                         end
@@ -77,7 +83,8 @@ classdef gameBoard < handle
                                 if (obj.board(i,j-1) == 0)
                                     leftSquare = j-1;
                                     curSquare = j;
-                                    while(obj.board(i,leftSquare) == 0 && leftSquare > 0)
+                                    nMoved = nMoved+1;
+                                    while(leftSquare > 0 && obj.board(i,leftSquare) == 0)
                                         obj.board(i,leftSquare) = obj.board(i,curSquare);
                                         obj.board(i,curSquare) = 0;
                                         leftSquare = leftSquare-1;
@@ -94,20 +101,22 @@ classdef gameBoard < handle
                                     obj.board(i,j-1) = obj.board(i,j-1)*2;
                                     obj.board(i,j) = 0;
                                     obj.noCombine(i,j-1) = 1;
+                                    nMoved = nMoved+1;
                                 end
                             end
                         end
                     end
                 case 3 % down
                     for i=1:size(obj.board,2) % across columns (horizontal)
-                        for j=1:size(obj.board,1) % down rows (vertical)
-                            if (j==obj.boardHeight || obj.board(i,j)==0)
+                        for j=fliplr(1:size(obj.board,1)) % down rows (vertical)
+                            if (j==obj.boardHeight || obj.board(j,i)==0)
                                 continue;
                             else
                                 if (obj.board(j+1,i) == 0)
                                     belowSquare = j+1;
                                     curSquare = j;
-                                    while(obj.board(belowSquare,i) == 0 && belowSquare <= obj.boardHeight)
+                                    nMoved = nMoved+1;
+                                    while(belowSquare <= obj.boardHeight && obj.board(belowSquare,i) == 0)
                                         obj.board(belowSquare,i) = obj.board(curSquare,i);
                                         obj.board(curSquare,i) = 0;
                                         belowSquare = belowSquare + 1;
@@ -124,20 +133,22 @@ classdef gameBoard < handle
                                     obj.board(j+1,i) = obj.board(j+1,i)*2;
                                     obj.board(j,i) = 0;
                                     obj.noCombine(j+1,i) = 1;
+                                    nMoved = nMoved+1;
                                 end
                             end
                         end
                     end
                 case 4 % right
                     for i=1:size(obj.board,1) % down rows (vertical)
-                        for j=1:size(obj.board,2) % across columns (horizontal)
+                        for j=fliplr(1:size(obj.board,2)) % across columns (horizontal)
                             if (j == obj.boardWidth || obj.board(i,j) == 0)
                                 continue;
                             else
                                 if (obj.board(i,j+1) == 0)
                                     rightSquare = j+1;
                                     curSquare = j;
-                                    while(obj.board(i,rightSquare) == 0 && rightSquare <= obj.boardWidth)
+                                    nMoved = nMoved+1;
+                                    while(rightSquare <= obj.boardWidth && obj.board(i,rightSquare) == 0)
                                         obj.board(i,rightSquare) = obj.board(i,curSquare);
                                         obj.board(i,curSquare) = 0;
                                         rightSquare = rightSquare+1;
@@ -154,6 +165,7 @@ classdef gameBoard < handle
                                     obj.board(i,j+1) = obj.board(i,j+1)*2;
                                     obj.board(i,j) = 0;
                                     obj.noCombine(i,j+1) = 1;
+                                    nMoved = nMoved+1;
                                 end
                             end
                         end
@@ -173,7 +185,16 @@ classdef gameBoard < handle
         end
         
         function plotBoard(obj)
-            imagesc(log2(obj.board)+1); colormap(obj.cmap)
+            imagesc(log2(obj.board)+1); colormap(obj.cmap); caxis([1 64]); %xlim([0 4]); %ylim([0 4])
+            for i=1:obj.boardWidth
+                for j=1:obj.boardHeight
+                    if (obj.board(j,i) == 0)
+                        continue;
+                    else
+                        text(i-.2,j,[num2str(obj.board(j,i))],'FontSize',20,'FontWeight','bold')
+                    end
+                end
+            end
         end
     end
 end
