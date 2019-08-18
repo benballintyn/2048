@@ -20,6 +20,7 @@ global g
             g.newBlock();
             g.plotBoard();
         end
+        g.isGameOver();
     elseif strcmpi(evnt.Key,'rightarrow')
         n=g.updateBoard(4);
         g.plotBoard();
@@ -27,6 +28,7 @@ global g
             g.newBlock();
             g.plotBoard();
         end
+        g.isGameOver();
     elseif strcmpi(evnt.Key,'downarrow')
         n=g.updateBoard(3);
         g.plotBoard();
@@ -34,6 +36,7 @@ global g
             g.newBlock();
             g.plotBoard();
         end
+        g.isGameOver();
     elseif (strcmpi(evnt.Key,'uparrow'))
         n=g.updateBoard(1);
         g.plotBoard();
@@ -41,5 +44,6 @@ global g
             g.newBlock();
             g.plotBoard();
         end
+        g.isGameOver();
     end
 end

@@ -33,6 +33,7 @@ classdef gameBoard < handle
                 figure;
                 plotBoard(obj)
             end
+            obj.score = 0;
         end
         
         function nMoved=updateBoard(obj,move)
@@ -59,12 +60,14 @@ classdef gameBoard < handle
                                     end
                                     if (aboveSquare > 0)
                                         if (obj.board(aboveSquare,i) == obj.board(curSquare,i) && ~obj.noCombine(aboveSquare,i))
+                                            obj.score = obj.score + obj.board(curSquare,i)*2;
                                             obj.board(aboveSquare,i) = obj.board(aboveSquare,i)*2;
                                             obj.board(curSquare,i) = 0;
                                             obj.noCombine(aboveSquare,i) = 1;
                                         end
                                     end
                                 elseif (obj.board(j-1,i) == obj.board(j,i) && ~obj.noCombine(j-1,i))
+                                    obj.score = obj.score + obj.board(j,i)*2;
                                     obj.board(j-1,i) = obj.board(j-1,i)*2;
                                     obj.board(j,i) = 0;
                                     obj.noCombine(j-1,i) = 1;
@@ -91,12 +94,14 @@ classdef gameBoard < handle
                                     end
                                     if (leftSquare > 0)
                                         if (obj.board(i,leftSquare) == obj.board(i,curSquare) && ~obj.noCombine(i,leftSquare))
+                                            obj.score = obj.score + obj.board(i,curSquare)*2;
                                             obj.board(i,leftSquare) = obj.board(i,leftSquare)*2;
                                             obj.board(i,curSquare) = 0;
                                             obj.noCombine(i,leftSquare) = 1;
                                         end
                                     end
                                 elseif (obj.board(i,j-1) == obj.board(i,j) && ~obj.noCombine(i,j-1))
+                                    obj.score = obj.score + obj.board(i,j)*2;
                                     obj.board(i,j-1) = obj.board(i,j-1)*2;
                                     obj.board(i,j) = 0;
                                     obj.noCombine(i,j-1) = 1;
@@ -123,12 +128,14 @@ classdef gameBoard < handle
                                     end
                                     if (belowSquare <= obj.boardHeight)
                                         if (obj.board(belowSquare,i) == obj.board(curSquare,i) && ~obj.noCombine(belowSquare,i))
+                                            obj.score = obj.score + obj.board(curSquare,i)*2;
                                             obj.board(belowSquare,i) = obj.board(belowSquare,i)*2;
                                             obj.board(curSquare,i) = 0;
                                             obj.noCombine(belowSquare,i) = 1;
                                         end
                                     end
                                 elseif (obj.board(j+1,i) == obj.board(j,i) && ~obj.noCombine(j+1,i))
+                                    obj.score = obj.score + obj.board(j,i)*2;
                                     obj.board(j+1,i) = obj.board(j+1,i)*2;
                                     obj.board(j,i) = 0;
                                     obj.noCombine(j+1,i) = 1;
@@ -155,12 +162,14 @@ classdef gameBoard < handle
                                     end
                                     if (rightSquare <= obj.boardWidth)
                                         if (obj.board(i,rightSquare) == obj.board(i,curSquare) && ~obj.noCombine(i,rightSquare))
+                                            obj.score = obj.score + obj.board(i,curSquare)*2;
                                             obj.board(i,rightSquare) = obj.board(i,rightSquare)*2;
                                             obj.board(i,curSquare) = 0;
                                             obj.noCombine(i,rightSquare) = 1;
                                         end
                                     end
                                 elseif (obj.board(i,j+1) == obj.board(i,j) && ~obj.noCombine(i,j+1))
+                                    obj.score = obj.score + obj.board(i,j)*2;
                                     obj.board(i,j+1) = obj.board(i,j+1)*2;
                                     obj.board(i,j) = 0;
                                     obj.noCombine(i,j+1) = 1;
@@ -194,6 +203,41 @@ classdef gameBoard < handle
                     end
                 end
             end
+            title(['Score = ' num2str(obj.score)])
+            drawnow;
+        end
+        
+        function gameOver = isGameOver(obj)
+            gameOver = 1;
+            for i=1:obj.boardWidth
+                for j=1:obj.boardHeight
+                    if (obj.board(i,j) == 0)
+                        gameOver = 0;
+                        return;
+                    end
+                    if (j-1 > 0 && obj.board(i,j) == obj.board(i,j-1))
+                        gameOver = 0;
+                        return;
+                    end
+                    if (i-1 > 0 && obj.board(i,j) == obj.board(i-1,j))
+                        gameOver = 0;
+                        return;
+                    end
+                    if (j+1 <= obj.boardHeight && obj.board(i,j) == obj.board(i,j+1))
+                        gameOver = 0;
+                        return;
+                    end
+                    if (i+1 <= obj.boardWidth && obj.board(i,j) == obj.board(i+1,j))
+                        gameOver = 0;
+                        return;
+                    end
+                end
+            end
+            disp(['GAME OVER!  Final Score = ' num2str(obj.score)])
+        end
+        
+        function state = getGameState(obj)
+            state = obj.board(:);
         end
     end
 end
