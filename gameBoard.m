@@ -30,8 +30,7 @@ classdef gameBoard < handle
             if (strcmp(options.playMode,'human'))
                 disp('Manual play')
             else
-                figure;
-                plotBoard(obj)
+                %plotBoard(obj)
             end
             obj.score = 0;
         end

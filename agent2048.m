@@ -101,7 +101,7 @@ classdef agent2048 < handle
             s2 = [obj.updateBuffer.state2];
             actions = [obj.updateBuffer.action];
             r = [obj.updateBuffer.reward];
-            targets = zeros(4,obj.maxUpdateBufferSize);
+            targets = zeros(4,length(obj.updateBuffer));
             for i=1:length(obj.updateBuffer)
                 targets(:,i) = obj.Qnet(s1(:,i));
                 targets(actions(i)) = r(i) + obj.gamma*max(obj.Qnet(s2(:,i)));
