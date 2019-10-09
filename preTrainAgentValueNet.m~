@@ -1,0 +1,19 @@
+function [agent] = preTrainAgentValueNet(agent,preTrainData,batchSize)
+nsamples = length(preTrainData);
+nbatches = ceil(nsamples/batchSize)*10;
+for i=1:nbatches
+    randInds = ceil(rand(1,batchSize)*nsamples);
+    s1 = [preTrainData(start_ind:end_ind).state1];
+    a  = [preTrainData(start_ind:end_ind).action];
+    r  = [preTrainData(start_ind:end_ind).reward];
+    s2 = [preTrainData(start_ind:end_ind).state2];
+    v2 = agent.Qnet(s2);
+    t = agent.Qnet(s1);
+    for j=1:(end_ind - start_ind + 1)
+        t(a(j),j) = r(j) + agent.gamma*max(v2(:,j));
+    end
+    agent.Qnet = train(agent.Qnet,s1,t);
+    disp(['Done with batch #' num2str(i)])
+end
+end
+
